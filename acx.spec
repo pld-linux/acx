@@ -9,13 +9,13 @@
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		acx100
-Version:	0.2.0pre8_plus_fixes_35
+Version:	0.2.0pre8_plus_fixes_37
 %define	_rel	1
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
-# Source0-md5:  d58fe2345aedd57cb3c8bd7d0c4f7042 
+# Source0-md5:	dbe64c064aa3557eea492398d3ed0a42
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.3}
 BuildRequires:	%{kgcc_package}
@@ -90,6 +90,10 @@ done
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
+#Add directory to store firmware
+install -d $RPM_BUILD_ROOT%{_datadir}/acx
+
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
 for cfg in %{buildconfigs}; do
@@ -121,9 +125,11 @@ rm -rf $RPM_BUILD_ROOT
 %files -n kernel-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
+%dir %{_datadir}/acx
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 
 %files -n kernel-smp-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
+%dir %{_datadir}/acx
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
