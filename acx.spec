@@ -5,13 +5,12 @@
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		kernel-net-acx100
-Version:	0.2.0pre6_plus_fixes_7
+Version:	0.2.0pre8_plus_fixes_3
 %define	_rel	1
 Release:	%{_rel}@%{_kernel_ver_str}
 License:	MPL or GPL
 Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-%{version}.tar.bz2
-# Source0-md5:	d03a9252ad411bd77eeb508a34bca8bd
 URL:		http://acx100.sourcefroge.net/index.html
 %{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}
 BuildRequires:	%{kgcc_package}
@@ -52,8 +51,8 @@ EOF
 	CC="%{kgcc}" \
 	CPPFLAGS="-D__KERNEL__ -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
 	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs"
-mv -f src/acx100_pci.o acx100_pci-up.o
-mv -f src/acx100_usb.o acx100_usb-up.o
+mv -f src/acx_pci.o acx_pci-up.o
+mv -f src/acx_usb.o acx_usb-up.o
 
 %{__make} clean -C src
 %{__make} \
@@ -65,10 +64,10 @@ mv -f src/acx100_usb.o acx100_usb-up.o
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
-install acx100_pci-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_pci.o
-install acx100_usb-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_usb.o
-install src/acx100_pci.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.o
-install src/acx100_usb.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_usb.o
+install acx_pci-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx_pci.o
+install acx_usb-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx_usb.o
+install src/acx_pci.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx_pci.o
+install src/acx_usb.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx_usb.o
 
 %clean
 rm -rf $RPM_BUILD_ROOT
