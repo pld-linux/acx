@@ -17,7 +17,7 @@ Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
 # Source0-md5:	3fe28dc1ac040b6f258e31e1ca5157d0
 URL:		http://acx100.sourceforge.net/
-%{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.6.3}
+%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.3}
 BuildRequires:	%{kgcc_package}
 BuildRequires:	rpmbuild(macros) >= 1.118
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
