@@ -128,8 +128,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/acx
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 
+%if %{with smp}
 %files -n kernel-smp-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
 %dir %{_datadir}/acx
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
+%endif
