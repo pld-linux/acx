@@ -14,7 +14,7 @@ Version:	0.2.0pre4
 Release:	%{_rel}@%{_kernel_ver_str}
 License:	GPL
 Group:		Base/Kernel
-Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-0.2.0pre4.tar.bz2
+Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-%{version}.tar.bz2
 # Source0-md5:	cc4e97d866116af36f24b1c52db8e4a8
 URL:		http://acx100.sourcefroge.net/index.html
 %{!?_without_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}}
@@ -34,7 +34,7 @@ Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
 %setup -q -c
 
 %build
-%{__make} -C acx100-0.2.0pre3
+%{__make} -C acx100-%{version}
 
 %install
 rm -rf $RPM_BUILD_ROOT
