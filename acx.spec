@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
+%bcond_without	smp		# don't build SMP module
 #
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
@@ -64,7 +65,7 @@ for cfg in %{buildconfigs}; do
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
 		exit 1
 	fi
-	#rm -rf include
+	rm -f include/asm
 	chmod 000 modules
 	install -d include/{linux,config}
 	%{__make} -C %{_kernelsrcdir} clean \
