@@ -5,13 +5,13 @@
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		kernel-net-acx100
-Version:	0.2.0pre8_plus_fixes_12
+Version:	0.2.0pre8_plus_fixes_13
 %define	_rel	1
 Release:	%{_rel}@%{_kernel_ver_str}
 License:	MPL or GPL
 Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-%{version}.tar.bz2
-# Source0-md5:	48ed40be0cc317c795a82ea74ddbcd1c
+#Source0-MD5:   4daf538ed007ac4181c952703223e556
 URL:		http://acx100.sourcefroge.net/index.html
 %{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}
 BuildRequires:	%{kgcc_package}
@@ -51,7 +51,8 @@ EOF
 %{__make} \
 	CC="%{kgcc}" \
 	CPPFLAGS="-D__KERNEL__ -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
-	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs"
+	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs -mpreferred-stack-boundary=4 -pipe -DACX_IO_WIDTH=32"
+
 mv -f src/acx_pci.o acx_pci-up.o
 mv -f src/acx_usb.o acx_usb-up.o
 
@@ -59,7 +60,7 @@ mv -f src/acx_usb.o acx_usb-up.o
 %{__make} \
 	CC="%{kgcc}" \
 	CPPFLAGS="-D__KERNEL__ -D__KERNEL_SMP -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
-	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs"
+	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs -mpreferred-stack-boundary=4 -pipe -DACX_IO_WIDTH=32"
 
 %install
 rm -rf $RPM_BUILD_ROOT
