@@ -44,6 +44,7 @@ Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 
 %build
 cd src
+mv Makefile2.6 Makefile
 ln -sf %{_kernelsrcdir}/config-up .config
 rm -rf include
 install -d include/{linux,config}
@@ -56,7 +57,7 @@ touch include/config/MARKER
 	O=$PWD \
 	V=1
 
-mv acx100_pci.ko acx100_pci.ko-done
+mv acx_pci.ko acx_pci.ko-done
 
 #% %{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 mrproper
 
@@ -73,7 +74,7 @@ mv acx100_pci.ko acx100_pci.ko-done
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
-install src/acx100_pci.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_pci.ko
+install src/acx_pci.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx_pci.ko
 #install src/acx100_pci.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.ko
 
 %clean
