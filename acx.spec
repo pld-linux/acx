@@ -39,7 +39,7 @@ Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
-install acx100-0.2.0pre3/src/%{_orig_name}.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/%{_orig_name}.o
+install acx100-%{version}/src/%{_orig_name}.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/%{_orig_name}.o
 
 %clean
 rm -rf $RPM_BUILD_ROOT
