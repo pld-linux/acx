@@ -1,6 +1,7 @@
 #
+# Conditional build:
+%bcond_without	dist_kernel	# without distribution kernel
 #
-
 %define		no_install_post_compress_modules	1
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
@@ -13,7 +14,7 @@ Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-%{version}.tar.bz2
 # Source0-md5:	31533c147e4f1f268ee41a3c531ba6ab
 URL:		http://acx100.sourcefroge.net/index.html
-%{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}
+%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.0}
 BuildRequires:	%{kgcc_package}
 BuildRequires:	rpmbuild(macros) >= 1.118
 Requires(post,postun):	/sbin/depmod
@@ -50,7 +51,10 @@ cp ../include/* .
 ln -s %{_kernelsrcdir}/include/linux/autoconf-up.h include/linux/autoconf.h
 ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
 touch include/config/MARKER
-%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
+%{__make} -C %{_kernelsrcdir} modules \
+	SUBDIRS=$PWD \
+	O=$PWD \
+	V=1
 
 mv acx100_pci.ko acx100_pci.ko-done
 
@@ -92,7 +96,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc ChangeLog README TODO doc/*
 /lib/modules/%{_kernel_ver}/misc/*
 
-%files -n kernel-smp-net-acx100
-%defattr(644,root,root,755)
-%doc ChangeLog README TODO doc/*
+#%files -n kernel-smp-net-acx100
+#%defattr(644,root,root,755)
+#%doc ChangeLog README TODO doc/*
 #/lib/modules/%{_kernel_ver}smp/misc/*.ko
