@@ -5,15 +5,15 @@
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		acx100
-Version:	0.2.0pre8_plus_fixes_18
-%define	_rel	2
+Version:	0.2.0pre8_plus_fixes_30
+%define	_rel	1
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
-#Source0-MD5:   430aa98bc3cc3e7ee0cb0e0c170f4f8c
-URL:		http://acx100.sourcefroge.net/index.html
-%{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}
+# Source0-md5:	3fe28dc1ac040b6f258e31e1ca5157d0
+URL:		http://acx100.sourceforge.net/
+%{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.6.3}
 BuildRequires:	%{kgcc_package}
 BuildRequires:	rpmbuild(macros) >= 1.118
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -55,33 +55,49 @@ Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 %prep
 %setup -q
 
+%define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
+
 %build
-cat > config.mk <<EOF
-KERNEL_BUILD=%{_kernelsrcdir}
-VERSION_CODE=`grep LINUX_VERSION_CODE %{_kernelsrcdir}/include/linux/version.h | sed -e 's/[^0-9]//g'`
-EOF
-%{__make} \
-	CC="%{kgcc}" \
-	CPPFLAGS="-D__KERNEL__ -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
-	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs -mpreferred-stack-boundary=4 -pipe -DACX_IO_WIDTH=32"
-
-mv -f src/acx_pci.o acx_pci-up.o
-mv -f src/acx_usb.o acx_usb-up.o
-
-%{__make} clean -C src
-%{__make} \
-	CC="%{kgcc}" \
-	CPPFLAGS="-D__KERNEL__ -D__KERNEL_SMP -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
-	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs -mpreferred-stack-boundary=4 -pipe -DACX_IO_WIDTH=32"
+mv src/Makefile2.6 src/Makefile
+for cfg in %{buildconfigs}; do
+	mkdir -p modules/$cfg
+	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
+		exit 1
+	fi
+	#rm -rf include
+	chmod 000 modules
+	install -d include/{linux,config}
+	%{__make} -C %{_kernelsrcdir} clean \
+		SUBDIRS=$PWD/src \
+		O=$PWD \
+		%{?with_verbose:V=1}
+	install -d include/config
+	chmod 700 modules
+	ln -sf %{_kernelsrcdir}/config-$cfg .config
+	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
+	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm #FIXME
+	touch include/config/MARKER
+	%{__make} -C %{_kernelsrcdir} modules \
+		SUBDIRS=$PWD/src \
+		O=$PWD \
+		%{?with_verbose:V=1}
+	mv src/*.ko modules/$cfg/
+done
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
-install acx_pci-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx_pci.o
-install acx_usb-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx_usb.o
-install src/acx_pci.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx_pci.o
-install src/acx_usb.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx_usb.o
+for cfg in %{buildconfigs}; do
+	cfgdest=''
+	if [ "$cfg" = "smp" ]; then
+		install modules/$cfg/*.ko \
+			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}$cfg/misc
+	else
+		install modules/$cfg/*.ko \
+			$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc
+	fi
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -101,9 +117,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -n kernel-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
-/lib/modules/%{_kernel_ver}/misc/*.o*
+/lib/modules/%{_kernel_ver}/misc/*.ko*
 
 %files -n kernel-smp-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
-/lib/modules/%{_kernel_ver}smp/misc/*.o*
+/lib/modules/%{_kernel_ver}smp/misc/*.ko*
