@@ -44,17 +44,13 @@ cd src
 ln -sf %{_kernelsrcdir}/config-up .config
 rm -rf include
 install -d include/{linux,config}
-cp ../include/* include/
+cp ../include/* .
 ln -s %{_kernelsrcdir}/include/linux/autoconf-up.h include/linux/autoconf.h
 ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
 touch include/config/MARKER
-echo 'acx100_pci-objs := acx100.o acx100_conv.o acx100_helper.o acx100_helper2.o acx100_ioctl.o acx80211frm.o idma.o ihw.o' > Makefile
-echo 'obj-m = acx100_pci.o'>>Makefile
-echo 'obj-m = acx100_usb.o'>>Makefile
 %{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
 
 mv acx100_pci.ko acx100_pci.ko-done
-mv acx100_usb.ko acx100_usb.ko-done
 
 %{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 mrproper
 
@@ -65,9 +61,6 @@ cp ../include/* include/
 ln -s %{_kernelsrcdir}/include/linux/autoconf-smp.h include/linux/autoconf.h
 ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
 touch include/config/MARKER
-echo 'acx100_pci-objs := acx100.o acx100_conv.o acx100_helper.o acx100_helper2.o acx100_ioctl.o acx80211frm.o idma.o ihw.o' > Makefile
-echo 'obj-m = acx100_pci.o'>>Makefile
-echo 'obj-m = acx100_usb.o'>>Makefile
 %{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
 
 %install
@@ -75,9 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
 install src/acx100_pci.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_pci.ko
-install src/acx100_usb.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_usb.ko
 install src/acx100_pci.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.ko
-install src/acx100_usb.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_usb.ko
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -97,9 +88,9 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
-/lib/modules/%{_kernel_ver}/misc/*.o*
+/lib/modules/%{_kernel_ver}/misc/*.ko
 
 %files -n kernel-smp-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
-/lib/modules/%{_kernel_ver}smp/misc/*.o*
+/lib/modules/%{_kernel_ver}smp/misc/*.ko
