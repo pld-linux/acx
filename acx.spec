@@ -14,8 +14,8 @@ Version:	0.2.0pre4
 Release:	%{_rel}@%{_kernel_ver_str}
 License:	GPL
 Group:		Base/Kernel
-Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-0.2.0pre3.tar.bz2
-# Source0-md5:	2bc303de3882c7ee6dfe4cc4e56df47e
+Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-0.2.0pre4.tar.bz2
+# Source0-md5:	cc4e97d866116af36f24b1c52db8e4a8
 URL:		http://acx100.sourcefroge.net/index.html
 %{!?_without_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}}
 BuildRequires:	rpmbuild(macros) >= 1.118
