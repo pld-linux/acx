@@ -1,6 +1,4 @@
 #
-# Conditional build:
-%bcond_without	dist_kernel	# without distribution kernel
 #
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
@@ -16,7 +14,6 @@ URL:		http://acx100.sourcefroge.net/index.html
 %{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}
 BuildRequires:	%{kgcc_package}
 BuildRequires:	rpmbuild(macros) >= 1.118
-%{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
 Obsoletes:	kernel-net-acx100
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -31,7 +28,6 @@ Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
 Summary:	Linux SMP driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100
 Group:		Base/Kernel
-%{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel-smp-net-acx100
@@ -44,31 +40,44 @@ Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 %setup -q -n acx100-%{version}
 
 %build
-cat > config.mk <<EOF
-KERNEL_BUILD=%{_kernelsrcdir}
-VERSION_CODE=`grep LINUX_VERSION_CODE %{_kernelsrcdir}/include/linux/version.h | sed -e 's/[^0-9]//g'`
-EOF
-%{__make} \
-	CC="%{kgcc}" \
-	CPPFLAGS="-D__KERNEL__ -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
-	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs"
-mv -f src/acx100_pci.o acx100_pci-up.o
-mv -f src/acx100_usb.o acx100_usb-up.o
+cd src
+ln -sf %{_kernelsrcdir}/config-up .config
+rm -rf include
+install -d include/{linux,config}
+cp ../include/* include/
+ln -s %{_kernelsrcdir}/include/linux/autoconf-up.h include/linux/autoconf.h
+ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
+touch include/config/MARKER
+echo 'acx100_pci-objs := acx100.o acx100_conv.o acx100_helper.o acx100_helper2.o acx100_ioctl.o acx80211frm.o idma.o ihw.o' > Makefile
+echo 'obj-m = acx100_pci.o'>>Makefile
+echo 'obj-m = acx100_usb.o'>>Makefile
+%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
 
-%{__make} clean -C src
-%{__make} \
-	CC="%{kgcc}" \
-	CPPFLAGS="-D__KERNEL__ -D__KERNEL_SMP -DMODULE -DACX_DEBUG=1 -DWLAN_HOSTIF=WLAN_PCI -I%{_kernelsrcdir}/include -I../include" \
-	CFLAGS="%{rpmcflags} -fno-strict-aliasing -fno-common -fomit-frame-pointer -Wall -Wstrict-prototypes -Wno-trigraphs"
+mv acx100_pci.ko acx100_pci.ko-done
+mv acx100_usb.ko acx100_usb.ko-done
+
+%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 mrproper
+
+ln -sf %{_kernelsrcdir}/config-smp .config
+rm -rf include
+install -d include/{linux,config}
+cp ../include/* include/
+ln -s %{_kernelsrcdir}/include/linux/autoconf-smp.h include/linux/autoconf.h
+ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
+touch include/config/MARKER
+echo 'acx100_pci-objs := acx100.o acx100_conv.o acx100_helper.o acx100_helper2.o acx100_ioctl.o acx80211frm.o idma.o ihw.o' > Makefile
+echo 'obj-m = acx100_pci.o'>>Makefile
+echo 'obj-m = acx100_usb.o'>>Makefile
+%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
-install acx100_pci-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_pci.o
-install acx100_usb-up.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_usb.o
-install src/acx100_pci.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.o
-install src/acx100_usb.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_usb.o
+install src/acx100_pci.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_pci.ko
+install src/acx100_usb.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_usb.ko
+install src/acx100_pci.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.ko
+install src/acx100_usb.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_usb.ko
 
 %clean
 rm -rf $RPM_BUILD_ROOT
