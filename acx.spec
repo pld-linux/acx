@@ -4,21 +4,18 @@
 #
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
-Name:		kernel-net-acx100
+Name:		acx100
 Version:	0.2.0pre8_plus_fixes_18
 %define	_rel	2
-Release:	%{_rel}@%{_kernel_ver_str}
+Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
-Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/acx100-%{version}.tar.bz2
+Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
 #Source0-MD5:   430aa98bc3cc3e7ee0cb0e0c170f4f8c
 URL:		http://acx100.sourcefroge.net/index.html
 %{?with_dist_kernel:BuildRequires:	kernel-headers >= 2.4.0}
 BuildRequires:	%{kgcc_package}
 BuildRequires:	rpmbuild(macros) >= 1.118
-%{?with_dist_kernel:%requires_releq_kernel_up}
-Requires(post,postun):	/sbin/depmod
-Obsoletes:	kernel-net-acx100
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -27,9 +24,24 @@ This is driver for WLAN card based on ACX100 for Linux.
 %description -l pl
 Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
 
+%package -n kernel-net-acx100
+Summary:	Linux driver for WLAN card base on ACX100
+Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
+Release:	%{_rel}@%{_kernel_ver_str}
+Group:		Base/Kernel
+%{?with_dist_kernel:%requires_releq_kernel_up}
+Requires(post,postun):	/sbin/depmod
+
+%description -n kernel-net-acx100
+This is driver for WLAN card based on ACX100 for Linux.
+
+%description -n kernel-net-acx100 -l pl
+Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
+
 %package -n kernel-smp-net-acx100
 Summary:	Linux SMP driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100
+Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
@@ -41,7 +53,7 @@ Linux SMP driver for WLAN card base on ACX100.
 Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 
 %prep
-%setup -q -n acx100-%{version}
+%setup -q
 
 %build
 cat > config.mk <<EOF
@@ -74,10 +86,10 @@ install src/acx_usb.o $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx_usb
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
+%post	-n kernel-net-acx100
 %depmod %{_kernel_ver}
 
-%postun
+%postun	-n kernel-net-acx100
 %depmod %{_kernel_ver}
 
 %post	-n kernel-smp-net-acx100
@@ -86,7 +98,7 @@ rm -rf $RPM_BUILD_ROOT
 %postun	-n kernel-smp-net-acx100
 %depmod %{_kernel_ver}smp
 
-%files
+%files -n kernel-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
 /lib/modules/%{_kernel_ver}/misc/*.o*
