@@ -80,10 +80,10 @@ rm -rf $RPM_BUILD_ROOT
 %depmod %{_kernel_ver}
 
 %post	-n kernel-smp-net-acx100
-%depmod %{_kernel_ver}
+%depmod %{_kernel_ver}smp
 
 %postun	-n kernel-smp-net-acx100
-%depmod %{_kernel_ver}
+%depmod %{_kernel_ver}smp
 
 %files
 %defattr(644,root,root,755)
