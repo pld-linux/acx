@@ -1,5 +1,7 @@
 #
 #
+
+%define		no_install_post_compress_modules	1
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		kernel-net-acx100
@@ -52,23 +54,23 @@ touch include/config/MARKER
 
 mv acx100_pci.ko acx100_pci.ko-done
 
-%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 mrproper
+#% %{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 mrproper
 
-ln -sf %{_kernelsrcdir}/config-smp .config
-rm -rf include
-install -d include/{linux,config}
-cp ../include/* include/
-ln -s %{_kernelsrcdir}/include/linux/autoconf-smp.h include/linux/autoconf.h
-ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
-touch include/config/MARKER
-%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
+#ln -sf %{_kernelsrcdir}/config-smp .config
+#rm -rf include
+#install -d include/{linux,config}
+#cp ../include/* include/
+#ln -s %{_kernelsrcdir}/include/linux/autoconf-smp.h include/linux/autoconf.h
+#ln -s %{_kernelsrcdir}/include/asm-%{_arch} include/asm
+#touch include/config/MARKER
+#%%{__make} -C %{_kernelsrcdir} SUBDIRS=$PWD O=$PWD V=1 modules
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
 install src/acx100_pci.ko-done $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/acx100_pci.ko
-install src/acx100_pci.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.ko
+#install src/acx100_pci.ko $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/acx100_pci.ko
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -88,9 +90,9 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
-/lib/modules/%{_kernel_ver}/misc/*.ko
+/lib/modules/%{_kernel_ver}/misc/*
 
 %files -n kernel-smp-net-acx100
 %defattr(644,root,root,755)
 %doc ChangeLog README TODO doc/*
-/lib/modules/%{_kernel_ver}smp/misc/*.ko
+#/lib/modules/%{_kernel_ver}smp/misc/*.ko
