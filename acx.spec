@@ -15,7 +15,7 @@ Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
-# Source1-md5:  d58fe2345aedd57cb3c8bd7d0c4f7042 
+# Source0-md5:  d58fe2345aedd57cb3c8bd7d0c4f7042 
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.3}
 BuildRequires:	%{kgcc_package}
