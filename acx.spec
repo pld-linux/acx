@@ -9,13 +9,13 @@
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		acx100
-Version:	0.2.0pre8_plus_fixes_30
+Version:	0.2.0pre8_plus_fixes_35
 %define	_rel	1
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
 Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
-# Source0-md5:	3fe28dc1ac040b6f258e31e1ca5157d0
+# Source1-md5:  d58fe2345aedd57cb3c8bd7d0c4f7042 
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.3}
 BuildRequires:	%{kgcc_package}
