@@ -1,16 +1,19 @@
+# TODO:
+# - add firmware download?
 #
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
 %bcond_without	smp		# don't build SMP module
 #
-# TODO:
-# - add firmware download?
+%ifarch sparc
+%undefine	with_smp
+%endif
 #
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
 Name:		acx100
 Version:	0.2.0pre8_plus_fixes_57
-%define	_rel	1
+%define	_rel	3
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
@@ -20,15 +23,7 @@ URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.3}
 BuildRequires:	%{kgcc_package}
 BuildRequires:	rpmbuild(macros) >= 1.118
-%ifarch sparc
-BuildRequires:	crosssparc64-gcc
-%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%ifarch sparc
-%define		_target_base_arch	sparc64
-%define		_target_base_cpu	sparc64
-%endif
 
 %description
 This is driver for WLAN card based on ACX100 for Linux.
@@ -87,16 +82,12 @@ for cfg in %{buildconfigs}; do
 	chmod 700 modules
 	ln -sf %{_kernelsrcdir}/config-$cfg .config
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
-%ifarch ppc
-	if [ -d "%{_kernelsrcdir}/include/asm-powerpc" ]; then
-		install -d include/asm
-		cp -a %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
-		cp -a %{_kernelsrcdir}/include/asm-powerpc/* include/asm
-	else
-		ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
-	fi
+%ifarch ppc ppc64
+        install -d include/asm
+        [ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
+        [ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
 %else
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
+        ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
 %endif
 	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
 	touch include/config/MARKER
