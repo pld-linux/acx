@@ -72,6 +72,7 @@ tar xfj %{SOURCE0}
 # kernel module(s)
 cd %{name}-%{version}
 #cd src
+install -d modules/{up,smp}
 for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
         if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
                 exit 1
@@ -103,7 +104,7 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
                 M=$PWD O=$PWD/o \
                 %{?with_verbose:V=1}
 
-        mv acx{,-$cfg}.ko
+        mv acx.ko modules/$cfg/
 done
 
 %install
@@ -143,14 +144,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n kernel-net-acx100
 %defattr(644,root,root,755)
-%doc ChangeLog README TODO doc/*
+%doc %{name}-%{version}/Changelog %{name}-%{version}/README
 %dir %{_datadir}/acx
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 
 %if %{with smp}
 %files -n kernel-smp-net-acx100
 %defattr(644,root,root,755)
-%doc ChangeLog README TODO doc/*
+%doc %{name}-%{version}/Changelog %{name}-%{version}/README
 %dir %{_datadir}/acx
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
 %endif
