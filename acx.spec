@@ -11,18 +11,17 @@
 #
 Summary:	Linux driver for WLAN card base on ACX100
 Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
-Name:		acx100
-Version:	0.2.0pre8_plus_fixes_57
-%define	_rel	3
+Name:		acx
+Version:	20060215
+%define	_rel	1
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
-Source0:	http://rhlx01.fht-esslingen.de/~andi/acx100/%{name}-%{version}.tar.bz2
-# Source0-md5:	f48eb1113764f150666644baf52656af
+Source0:	http://195.66.192.167/linux/acx_patches/%{name}-%{version}.tar.bz2
+# Source0-md5:	95bcd5df2365dfcfc78169b0331f69a2
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.3}
-BuildRequires:	%{kgcc_package}
-BuildRequires:	rpmbuild(macros) >= 1.118
+BuildRequires:	rpmbuild(macros) >= 1.286
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -60,47 +59,51 @@ Linux SMP driver for WLAN card base on ACX100.
 Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 
 %prep
-%setup -q
+#setup -q -n %{name}-%{version}
+cd $RPM_BUILD_DIR
+install -d %{name}-%{version}
+cd %{name}-%{version}
+tar xfj %{SOURCE0}
+/bin/chmod -Rf a+rX,u+w,g-w,o-w .
 
 %define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 
 %build
-mv src/Makefile2.6 src/Makefile
-for cfg in %{buildconfigs}; do
-	mkdir -p modules/$cfg
-	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
-		exit 1
-	fi
-	rm -f include/asm
-	chmod 000 modules
-	install -d include/{linux,config}
-	%{__make} -C %{_kernelsrcdir} clean \
-		SUBDIRS=$PWD/src \
-		O=$PWD \
-		%{?with_verbose:V=1}
-	install -d include/config
-	chmod 700 modules
-	ln -sf %{_kernelsrcdir}/config-$cfg .config
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-${cfg}.h include/linux/autoconf.h
-%ifarch ppc ppc64
-        install -d include/asm
-        [ ! -d %{_kernelsrcdir}/include/asm-powerpc ] || ln -sf %{_kernelsrcdir}/include/asm-powerpc/* include/asm
-        [ ! -d %{_kernelsrcdir}/include/asm-%{_target_base_arch} ] || ln -snf %{_kernelsrcdir}/include/asm-%{_target_base_arch}/* include/asm
+# kernel module(s)
+cd %{name}-%{version}
+#cd src
+for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
+        if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
+                exit 1
+        fi
+        install -d o/include/linux
+        ln -sf %{_kernelsrcdir}/config-$cfg o/.config
+        ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
+        ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
+%if %{with dist_kernel}
+        %{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 %else
-        ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
+        install -d o/include/config
+        touch o/include/config/MARKER
+        ln -sf %{_kernelsrcdir}/scripts o/scripts
 %endif
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
-	touch include/config/MARKER
-	%{__make} -C %{_kernelsrcdir} modules \
-%if "%{_target_base_arch}" != "%{_arch}"
-                ARCH=%{_target_base_arch} \
-                CROSS_COMPILE=%{_target_base_cpu}-pld-linux- \
-%endif
-                HOSTCC="%{__cc}" \
-		SUBDIRS=$PWD/src \
-		O=$PWD \
-		%{?with_verbose:V=1}
-	mv src/*.ko modules/$cfg/
+#
+#       patching/creating makefile(s) (optional)
+#
+        %{__make} -C %{_kernelsrcdir} clean \
+                RCS_FIND_IGNORE="-name '*.ko' -o" \
+                SYSSRC=%{_kernelsrcdir} \
+                SYSOUT=$PWD/o \
+                M=$PWD O=$PWD/o \
+                %{?with_verbose:V=1}
+        %{__make} -C %{_kernelsrcdir} modules \
+                CC="%{__cc}" CPP="%{__cpp}" \
+                SYSSRC=%{_kernelsrcdir} \
+                SYSOUT=$PWD/o \
+                M=$PWD O=$PWD/o \
+                %{?with_verbose:V=1}
+
+        mv MODULE_NAME{,-$cfg}.ko
 done
 
 %install
