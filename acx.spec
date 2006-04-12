@@ -103,7 +103,7 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
                 M=$PWD O=$PWD/o \
                 %{?with_verbose:V=1}
 
-        mv MODULE_NAME{,-$cfg}.ko
+        mv acx{,-$cfg}.ko
 done
 
 %install
