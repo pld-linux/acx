@@ -107,6 +107,7 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 done
 
 %install
+cd %{name}-%{version}
 rm -rf $RPM_BUILD_ROOT
 
 #Add directory to store firmware
