@@ -59,64 +59,53 @@ Linux SMP driver for WLAN card base on ACX100.
 Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 
 %prep
-#setup -q -n %{name}-%{version}
-cd $RPM_BUILD_DIR
-install -d %{name}-%{version}
-cd %{name}-%{version}
-tar xfj %{SOURCE0}
-/bin/chmod -Rf a+rX,u+w,g-w,o-w .
-
-%define buildconfigs %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
+%setup -q -c -n %{name}-%{version}
 
 %build
 # kernel module(s)
-cd %{name}-%{version}
-#cd src
 install -d modules/{up,smp}
 for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
-        if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
-                exit 1
-        fi
-        install -d o/include/linux
-        ln -sf %{_kernelsrcdir}/config-$cfg o/.config
-        ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
-        ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
+	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
+		exit 1
+	fi
+	install -d o/include/linux
+	ln -sf %{_kernelsrcdir}/config-$cfg o/.config
+	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg o/Module.symvers
+	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h o/include/linux/autoconf.h
 %if %{with dist_kernel}
-        %{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
+	%{__make} -C %{_kernelsrcdir} O=$PWD/o prepare scripts
 %else
-        install -d o/include/config
-        touch o/include/config/MARKER
-        ln -sf %{_kernelsrcdir}/scripts o/scripts
+	install -d o/include/config
+	touch o/include/config/MARKER
+	ln -sf %{_kernelsrcdir}/scripts o/scripts
 %endif
 #
 #       patching/creating makefile(s) (optional)
 #
-        %{__make} -C %{_kernelsrcdir} clean \
-                RCS_FIND_IGNORE="-name '*.ko' -o" \
-                SYSSRC=%{_kernelsrcdir} \
-                SYSOUT=$PWD/o \
-                M=$PWD O=$PWD/o \
-                %{?with_verbose:V=1}
-        %{__make} -C %{_kernelsrcdir} modules \
-                CC="%{__cc}" CPP="%{__cpp}" \
-                SYSSRC=%{_kernelsrcdir} \
-                SYSOUT=$PWD/o \
-                M=$PWD O=$PWD/o \
-                %{?with_verbose:V=1}
+	%{__make} -C %{_kernelsrcdir} clean \
+		RCS_FIND_IGNORE="-name '*.ko' -o" \
+		SYSSRC=%{_kernelsrcdir} \
+		SYSOUT=$PWD/o \
+		M=$PWD O=$PWD/o \
+		%{?with_verbose:V=1}
+	%{__make} -C %{_kernelsrcdir} modules \
+		CC="%{__cc}" CPP="%{__cpp}" \
+		SYSSRC=%{_kernelsrcdir} \
+		SYSOUT=$PWD/o \
+		M=$PWD O=$PWD/o \
+		%{?with_verbose:V=1}
 
-        mv acx.ko modules/$cfg/
+	mv acx.ko modules/$cfg/
 done
 
 %install
-cd %{name}-%{version}
 rm -rf $RPM_BUILD_ROOT
 
-#Add directory to store firmware
+# Add directory to store firmware
 install -d $RPM_BUILD_ROOT%{_datadir}/acx
-
 install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
 
-for cfg in %{buildconfigs}; do
+for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
 	cfgdest=''
 	if [ "$cfg" = "smp" ]; then
 		install modules/$cfg/*.ko \
