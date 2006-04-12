@@ -59,7 +59,7 @@ Linux SMP driver for WLAN card base on ACX100.
 Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
 
 %prep
-%setup -q -c -n %{name}-%{version}
+%setup -q -c
 
 %build
 # kernel module(s)
