@@ -21,7 +21,7 @@ Source0:	http://195.66.192.167/linux/acx_patches/%{name}-%{version}.tar.bz2
 # Source0-md5:	95bcd5df2365dfcfc78169b0331f69a2
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.16}
-BuildRequires:	rpmbuild(macros) >= 1.326
+BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
