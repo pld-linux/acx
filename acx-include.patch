@@ -1,0 +1,11 @@
+diff -urN acx-20060521.orig/pci.c acx-20060521/pci.c
+--- acx-20060521.orig/pci.c	2007-01-03 20:37:30.249293750 +0100
++++ acx-20060521/pci.c	2007-01-03 20:38:14.548062250 +0100
+@@ -51,6 +51,7 @@
+ #include <linux/pm.h>
+ #include <linux/vmalloc.h>
+ #include <linux/dma-mapping.h>
++#include <linux/utsrelease.h>
+ 
+ #include "acx.h"
+ 
