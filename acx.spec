@@ -9,59 +9,57 @@
 %undefine	with_smp
 %endif
 #
-Summary:	Linux driver for WLAN card base on ACX100
-Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
+Summary:	Linux driver for WLAN card base on ACX100/ACX111
+Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100/ACX111
 Name:		acx
-Version:	20060521
+Version:	20070101
 %define	_rel	1
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
-Source0:	http://195.66.192.167/linux/acx_patches/%{name}-%{version}.tar.bz2
-# Source0-md5:	d6a59fc3d34fd596fbd345c24d50a4eb
-Patch0:		%{name}-include.patch
+Source0:	http://www.cmartin.tk/acx/%{name}-%{version}.tar.bz2
+# Source0-md5:	ec6322b9c82781897a9433ef0cefda6f
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.16}
 BuildRequires:	rpmbuild(macros) >= 1.330
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-This is driver for WLAN card based on ACX100 for Linux.
+This is driver for WLAN card based on ACX100/ACX111 for Linux.
 
 %description -l pl
-Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
+Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100/ACX111.
 
 %package -n kernel%{_alt_kernel}-net-acx100
-Summary:	Linux driver for WLAN card base on ACX100
-Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100
+Summary:	Linux driver for WLAN card base on ACX100/ACX111
+Summary(pl):	Sterownik dla Linuksa do kart bezprzewodowych na uk³adzie ACX100/ACX111
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel%{_alt_kernel}-net-acx100
-This is driver for WLAN card based on ACX100 for Linux.
+This is driver for WLAN card based on ACX100/ACX111 for Linux.
 
 %description -n kernel%{_alt_kernel}-net-acx100 -l pl
-Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100.
+Sterownik dla Linuksa do kart WLAN opartych o uk³ad ACX100/ACX111.
 
 %package -n kernel%{_alt_kernel}-smp-net-acx100
-Summary:	Linux SMP driver for WLAN card base on ACX100
-Summary(pl):	Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100
+Summary:	Linux SMP driver for WLAN card base on ACX100/ACX111
+Summary(pl):	Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100/ACX111
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
 %description -n kernel%{_alt_kernel}-smp-net-acx100
-Linux SMP driver for WLAN card base on ACX100.
+Linux SMP driver for WLAN card base on ACX100/ACX111.
 
 %description -n kernel%{_alt_kernel}-smp-net-acx100 -l pl
-Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100.
+Sterownik dla Linuksa SMP do kart bezprzewodowych na uk³adzie ACX100/ACX111.
 
 %prep
-%setup -q -c
-%patch0 -p1
+%setup -q
 
 %build
 %build_kernel_modules -m acx
