@@ -1,4 +1,5 @@
 # TODO:
+# - spec filename vs Name
 # - add firmware download?
 #
 # Conditional build:
