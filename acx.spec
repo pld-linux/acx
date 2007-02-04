@@ -3,6 +3,7 @@
 #
 # Conditional build:
 %bcond_without	dist_kernel	# without distribution kernel
+%bcond_without	up		# don't build UP module
 %bcond_without	smp		# don't build SMP module
 #
 %ifarch sparc
