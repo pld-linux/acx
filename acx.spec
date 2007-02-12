@@ -11,7 +11,7 @@
 %endif
 #
 Summary:	Linux driver for WLAN card base on ACX100/ACX111
-Summary(pl.UTF-8):   Sterownik dla Linuksa do kart bezprzewodowych na układzie ACX100/ACX111
+Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych na układzie ACX100/ACX111
 Name:		acx
 Version:	20070101
 %define	_rel	1
@@ -33,7 +33,7 @@ Sterownik dla Linuksa do kart WLAN opartych o układ ACX100/ACX111.
 
 %package -n kernel%{_alt_kernel}-net-acx100
 Summary:	Linux driver for WLAN card base on ACX100/ACX111
-Summary(pl.UTF-8):   Sterownik dla Linuksa do kart bezprzewodowych na układzie ACX100/ACX111
+Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych na układzie ACX100/ACX111
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_up}
@@ -47,7 +47,7 @@ Sterownik dla Linuksa do kart WLAN opartych o układ ACX100/ACX111.
 
 %package -n kernel%{_alt_kernel}-smp-net-acx100
 Summary:	Linux SMP driver for WLAN card base on ACX100/ACX111
-Summary(pl.UTF-8):   Sterownik dla Linuksa SMP do kart bezprzewodowych na układzie ACX100/ACX111
+Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do kart bezprzewodowych na układzie ACX100/ACX111
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 %{?with_dist_kernel:%requires_releq_kernel_smp}
