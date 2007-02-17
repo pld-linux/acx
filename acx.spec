@@ -14,7 +14,7 @@ Summary:	Linux driver for WLAN card base on ACX100/ACX111
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych na układzie ACX100/ACX111
 Name:		acx
 Version:	20070101
-%define	_rel	1
+%define	_rel	2
 Release:	%{_rel}
 License:	MPL or GPL
 Group:		Base/Kernel
@@ -31,32 +31,34 @@ This is driver for WLAN card based on ACX100/ACX111 for Linux.
 %description -l pl.UTF-8
 Sterownik dla Linuksa do kart WLAN opartych o układ ACX100/ACX111.
 
-%package -n kernel%{_alt_kernel}-net-acx100
+%package -n kernel%{_alt_kernel}-net-acx
 Summary:	Linux driver for WLAN card base on ACX100/ACX111
 Summary(pl.UTF-8):	Sterownik dla Linuksa do kart bezprzewodowych na układzie ACX100/ACX111
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
+Obsoletes:	kernel%{_alt_kernel}-net-acx100
 %{?with_dist_kernel:%requires_releq_kernel_up}
 Requires(post,postun):	/sbin/depmod
 
-%description -n kernel%{_alt_kernel}-net-acx100
+%description -n kernel%{_alt_kernel}-net-acx
 This is driver for WLAN card based on ACX100/ACX111 for Linux.
 
-%description -n kernel%{_alt_kernel}-net-acx100 -l pl.UTF-8
+%description -n kernel%{_alt_kernel}-net-acx -l pl.UTF-8
 Sterownik dla Linuksa do kart WLAN opartych o układ ACX100/ACX111.
 
-%package -n kernel%{_alt_kernel}-smp-net-acx100
+%package -n kernel%{_alt_kernel}-smp-net-acx
 Summary:	Linux SMP driver for WLAN card base on ACX100/ACX111
 Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do kart bezprzewodowych na układzie ACX100/ACX111
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
+Obsoletes:	kernel%{_alt_kernel}-smp-net-acx100
 %{?with_dist_kernel:%requires_releq_kernel_smp}
 Requires(post,postun):	/sbin/depmod
 
-%description -n kernel%{_alt_kernel}-smp-net-acx100
+%description -n kernel%{_alt_kernel}-smp-net-acx
 Linux SMP driver for WLAN card base on ACX100/ACX111.
 
-%description -n kernel%{_alt_kernel}-smp-net-acx100 -l pl.UTF-8
+%description -n kernel%{_alt_kernel}-smp-net-acx -l pl.UTF-8
 Sterownik dla Linuksa SMP do kart bezprzewodowych na układzie ACX100/ACX111.
 
 %prep
@@ -73,25 +75,27 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-n kernel%{_alt_kernel}-net-acx100
+%post	-n kernel%{_alt_kernel}-net-acx
 %depmod %{_kernel_ver}
 
-%postun	-n kernel%{_alt_kernel}-net-acx100
+%postun	-n kernel%{_alt_kernel}-net-acx
 %depmod %{_kernel_ver}
 
-%post	-n kernel%{_alt_kernel}-smp-net-acx100
+%post	-n kernel%{_alt_kernel}-smp-net-acx
 %depmod %{_kernel_ver}smp
 
-%postun	-n kernel%{_alt_kernel}-smp-net-acx100
+%postun	-n kernel%{_alt_kernel}-smp-net-acx
 %depmod %{_kernel_ver}smp
 
-%files -n kernel%{_alt_kernel}-net-acx100
+%if %{with up}
+%files -n kernel%{_alt_kernel}-net-acx
 %defattr(644,root,root,755)
 %doc Changelog README
 /lib/modules/%{_kernel_ver}/misc/*.ko*
+%endif
 
 %if %{with smp}
-%files -n kernel%{_alt_kernel}-smp-net-acx100
+%files -n kernel%{_alt_kernel}-smp-net-acx
 %defattr(644,root,root,755)
 %doc Changelog README
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
