@@ -1,0 +1,14 @@
+--- acx-20070101/common.c~	2007-01-10 21:15:27.000000000 +0000
++++ acx-20070101/common.c	2007-09-09 23:46:52.163771282 +0000
+@@ -2754,7 +2754,11 @@ acx_l_rxmonitor(acx_device_t *adev, cons
+ 	skb->dev = adev->ndev;
+ 	skb->dev->last_rx = jiffies;
+ 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 22)
+ 	skb->mac.raw = skb->data;
++#else
++	skb->mac_header = skb->data;
++#endif
+ 	skb->ip_summed = CHECKSUM_NONE;
+ 	skb->pkt_type = PACKET_OTHERHOST;
+ 	skb->protocol = htons(ETH_P_80211_RAW);
