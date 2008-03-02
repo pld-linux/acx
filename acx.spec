@@ -15,6 +15,8 @@ Group:		Base/Kernel
 Source0:	http://www.cmartin.tk/acx/%{name}-%{version}.tar.bz2
 # Source0-md5:	ec6322b9c82781897a9433ef0cefda6f
 Patch0:		%{name}-skb.patch
+# based on https://dev.openwrt.org/browser/trunk/package/acx/patches/003-2.6.24-compat.diff?rev=10425&format=txt
+Patch1:		%{name}-2.6.24.patch
 URL:		http://acx100.sourceforge.net/
 %{?with_dist_kernel:BuildRequires:	kernel%{_alt_kernel}-module-build >= 3:2.6.20.2}
 BuildRequires:	rpmbuild(macros) >= 1.379
@@ -44,6 +46,7 @@ Sterownik dla Linuksa do kart WLAN opartych o układ ACX100/ACX111.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %build_kernel_modules -m acx
