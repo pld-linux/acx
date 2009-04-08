@@ -1,0 +1,114 @@
+diff -upr acx-20070101./ioctl.c acx-20070101/ioctl.c
+--- acx-20070101./ioctl.c	2007-01-09 21:27:58.000000000 +0000
++++ acx-20070101/ioctl.c	2009-04-08 20:41:04.767480741 +0000
+@@ -488,6 +488,9 @@ end_unlock:
+ /* helper. not sure whether it's really a _s_leeping fn */
+ static char*
+ acx_s_scan_add_station(
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++	struct iw_request_info *info,
++#endif
+ 	acx_device_t *adev,
+ 	char *ptr,
+ 	char *end_buf,
+@@ -503,14 +506,22 @@ acx_s_scan_add_station(
+ 	iwe.u.ap_addr.sa_family = ARPHRD_ETHER;
+ 	MAC_COPY(iwe.u.ap_addr.sa_data, bss->bssid);
+ 	acxlog_mac(L_IOCTL, "scan, station address: ", bss->bssid, "\n");
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++	ptr = iwe_stream_add_event(info, ptr, end_buf, &iwe, IW_EV_ADDR_LEN);
++#else
+ 	ptr = iwe_stream_add_event(ptr, end_buf, &iwe, IW_EV_ADDR_LEN);
++#endif
+ 
+ 	/* Add ESSID */
+ 	iwe.cmd = SIOCGIWESSID;
+ 	iwe.u.data.length = bss->essid_len;
+ 	iwe.u.data.flags = 1;
+ 	log(L_IOCTL, "scan, essid: %s\n", bss->essid);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++	ptr = iwe_stream_add_point(info, ptr, end_buf, &iwe, bss->essid);
++#else
+ 	ptr = iwe_stream_add_point(ptr, end_buf, &iwe, bss->essid);
++#endif
+ 
+ 	/* Add mode */
+ 	iwe.cmd = SIOCGIWMODE;
+@@ -520,7 +531,11 @@ acx_s_scan_add_station(
+ 		else
+ 			iwe.u.mode = IW_MODE_ADHOC;
+ 		log(L_IOCTL, "scan, mode: %d\n", iwe.u.mode);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++		ptr = iwe_stream_add_event(info, ptr, end_buf, &iwe, IW_EV_UINT_LEN);
++#else
+ 		ptr = iwe_stream_add_event(ptr, end_buf, &iwe, IW_EV_UINT_LEN);
++#endif
+ 	}
+ 
+ 	/* Add frequency */
+@@ -528,7 +543,11 @@ acx_s_scan_add_station(
+ 	iwe.u.freq.m = acx_channel_freq[bss->channel - 1] * 100000;
+ 	iwe.u.freq.e = 1;
+ 	log(L_IOCTL, "scan, frequency: %d\n", iwe.u.freq.m);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++	ptr = iwe_stream_add_event(info, ptr, end_buf, &iwe, IW_EV_FREQ_LEN);
++#else
+ 	ptr = iwe_stream_add_event(ptr, end_buf, &iwe, IW_EV_FREQ_LEN);
++#endif
+ 
+ 	/* Add link quality */
+ 	iwe.cmd = IWEVQUAL;
+@@ -546,7 +565,11 @@ acx_s_scan_add_station(
+ 	iwe.u.qual.updated = 7;
+ 	log(L_IOCTL, "scan, link quality: %d/%d/%d\n",
+ 			iwe.u.qual.level, iwe.u.qual.noise, iwe.u.qual.qual);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++	ptr = iwe_stream_add_event(info, ptr, end_buf, &iwe, IW_EV_QUAL_LEN);
++#else
+ 	ptr = iwe_stream_add_event(ptr, end_buf, &iwe, IW_EV_QUAL_LEN);
++#endif
+ 
+ 	/* Add encryption */
+ 	iwe.cmd = SIOCGIWENCODE;
+@@ -556,7 +579,11 @@ acx_s_scan_add_station(
+ 		iwe.u.data.flags = IW_ENCODE_DISABLED;
+ 	iwe.u.data.length = 0;
+ 	log(L_IOCTL, "scan, encryption flags: %X\n", iwe.u.data.flags);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++	ptr = iwe_stream_add_point(info, ptr, end_buf, &iwe, bss->essid);
++#else
+ 	ptr = iwe_stream_add_point(ptr, end_buf, &iwe, bss->essid);
++#endif
+ 
+ 	/* add rates */
+ 	iwe.cmd = SIOCGIWRATE;
+@@ -570,8 +597,13 @@ acx_s_scan_add_station(
+ 		if (rate & 1) {
+ 			iwe.u.bitrate.value = *p * 500000; /* units of 500kb/s */
+ 			log(L_IOCTL, "scan, rate: %d\n", iwe.u.bitrate.value);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++			ptr_rate = iwe_stream_add_value(info, ptr, ptr_rate, end_buf,
++						&iwe, IW_EV_PARAM_LEN);
++#else
+ 			ptr_rate = iwe_stream_add_value(ptr, ptr_rate, end_buf,
+ 						&iwe, IW_EV_PARAM_LEN);
++#endif
+ 		}
+ 		rate >>= 1;
+ 		p++;
+@@ -625,8 +657,13 @@ acx_ioctl_get_scan(
+ 	for (i = 0; i < VEC_SIZE(adev->sta_list); i++) {
+ 		struct client *bss = &adev->sta_list[i];
+ 		if (!bss->used) continue;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)
++		ptr = acx_s_scan_add_station(info, adev, ptr,
++			extra + IW_SCAN_MAX_DATA, bss);
++#else
+ 		ptr = acx_s_scan_add_station(adev, ptr,
+ 			extra + IW_SCAN_MAX_DATA, bss);
++#endif
+ 	}
+ 	dwrq->length = ptr - extra;
+ 	dwrq->flags = 0;
+Only in acx-20070101: ioctl.c~
+Only in acx-20070101: o
