@@ -1,0 +1,13 @@
+--- acx-20070101/wlan_compat.h.orig	2006-05-20 20:27:57.000000000 +0200
++++ acx-20070101/wlan_compat.h	2009-08-28 18:52:52.000000000 +0200
+@@ -221,8 +221,10 @@
+ #ifndef IRQ_NONE
+ #define IRQ_NONE
+ #define IRQ_HANDLED
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 30)
+ typedef void irqreturn_t;
+ #endif
++#endif
+ 
+ #ifndef ARPHRD_IEEE80211_PRISM
+ #define ARPHRD_IEEE80211_PRISM 802
